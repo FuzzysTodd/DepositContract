@@ -1,0 +1,43 @@
+ounds like your Cloud Build triggers aren't firing as expected when you merge changes in GitHub. This is a common issue with a few potential causes. Let's walk through some troubleshooting steps to get your builds posting correctly:
+
+1. Verify GitHub App Installation and Repository Permissions:
+
+Check GitHub Account Settings: Go to your GitHub account settings, then navigate to "Integrations" and click on "Applications."
+Configure Cloud Build GitHub App: Find the "Google Cloud Build" app and click "Configure."
+Repository Access: Ensure that your FuzzysTodd/The-Nexus-Protocol-Token-DOA repository is included. You might have selected "All repositories" or "Only select repositories." If it was "Only select repositories," confirm your repository is explicitly listed. If it's not, you'll need to grant access.
+Admin Permissions: Ensure that the GitHub user account used to connect the repository to Cloud Build has admin-level permissions on the FuzzysTodd/The-Nexus-Protocol-Token-DOA repository.
+2. Review Your Cloud Build Trigger Configuration:
+
+Access Triggers: In the Google Cloud Console, go to Cloud Build > Triggers .
+Locate Trigger: Find the trigger associated with your FuzzysTodd/The-Nexus-Protocol-Token-DOA repository. If you don't have one, you'll need to create one.
+Event Type:
+"Push to a branch" is the most common for merges. This trigger type activates when code is pushed to a specific branch (like main or master ) after a merge.
+If you're merging a Pull Request, you might also consider a "Pull request" event type, but typically, the build for the merged result comes from the "Push to a branch" event on your target branch.
+Branch (regex): Check the regular expression for the branch.
+If you expect builds on merges into your main branch, ensure the regex is something like ^main$ or ^(main|master)$ . An incorrect regex (e.g., matching a feature branch instead of your target merge branch) will prevent triggers from firing.
+A common mistake is having a regex that's too specific or too broad.
+Configuration:
+Type: Make sure it's set to "Cloud Build configuration file (yaml or json)".
+Location: Verify that the "Cloud Build configuration file location" correctly points to your cloudbuild.json file in the root of your repository (e.g., /cloudbuild.json ). If the file is named cloudbuild.yaml or is in a subdirectory, the path must reflect that.
+Service Account Permissions:
+Your Cloud Build service account needs the necessary permissions to create builds. In the trigger configuration, check the "Service account" selected. Ensure this service account has the Cloud Build Service Account IAM role, or at least cloudbuild.builds.create permission. This is usually handled by default, but it's worth checking if other issues are ruled out.
+3. Check for Errors or Mismatches:
+
+Build Logs (for manual triggers): If you try to run the trigger manually (using the "Run trigger" button in the Cloud Build Triggers page), do you see any errors? Sometimes manual runs can reveal issues that prevent automatic triggers.
+GitHub Webhooks: While Cloud Build handles the webhook setup for you, sometimes there can be issues. On GitHub, go to your repository's settings -> "Webhooks." You should see a webhook entry for Google Cloud Build. Check its recent deliveries for any errors.
+Empty Commits or No Changes: If your merge results in an "empty commit" (no actual code changes), some CI/CD systems might not trigger a build. However, this is less common for merges that actually bring in new code.
+Cached Trigger Data: Occasionally, especially after permission changes, there might be a slight delay. Try making a trivial change (like adding a space to a README) and pushing it to the target branch to force a new trigger attempt.
+4. Confirm Your cloudbuild.json is Valid:
+
+File Existence: Ensure the cloudbuild.json (or cloudbuild.yaml ) file actually exists at the specified location in your repository after the merge.
+Syntax: Even a small syntax error in your build configuration file could prevent Cloud Build from being able to parse it, leading to a failed trigger.
+By systematically going through these checks, you should be able to identify why your builds aren't posting after merges in GitHub. Most often, it's a permission issue with the GitHub App or an incorrect branch regex in the trigger configuration.
+
+Troubleshooting build errors  |  Cloud Build Documentation  |  Google Cloud 
+# Troubleshooting build errors  |  Cloud Build Documentation  |  Google Cloud ## Trigger fails with ` Couldn't read commit ` error You see the following error when running a build trigger: ``` text Failed to trigger build: Couldn't read commit ``` Cloud Build returns this message if you are trying to trigger a build using a branch that does not exist. Review your directory names for spelling and consistency. For instructions on trigger setup, see [Create and manage build triggers](https://cloud.google.com/build/docs/automating-builds/create-manage-triggers) .
+
+Accessing GitHub from a build via SSH keys  |  Cloud Build Documentation  |  Google Cloud 
+# Accessing GitHub from a build via SSH keys  |  Cloud Build Documentation  |  Google Cloud ## Submit the build To submit the build, run the following command: ``` text gcloud builds submit --config=cloudbuild.yaml . ``` The output is similar to the following: ``` text Creating temporary tarball archive of 3 file(s) totalling 4.1 KiB before compression. Uploading tarball of [.] to [gs://[PROJECT-ID]_cloudbuild/source/1504288639.02---.tgz] Created [https://cloudbuild.googleapis.com/v1/projects/[PROJECT-ID]/builds/871b68bc---]. Logs are available at [https://console.cloud.google.com/cloud-build/builds/871b68bc---?project=[PROJECT-ID]]. ----------------------------- REMOTE BUILD OUTPUT ------------------------------ starting build "871b68bc-cefc-4411-856c-2a2b7c7d2487" FETCHSOURCE Fetching storage object: gs://[PROJECT-ID]_cloudbuild/source/1504288639.02---.tgz#1504288640827178 Copying gs://[PROJECT-ID]_cloudbuild/source/1504288639.02---.tgz#1504288640827178... / [1 files][ 3.9 KiB/ 3.9 KiB] Operation completed over 1 objects/3.9 KiB. BUILD Step #0: Already have image (with digest): gcr.io/cloud-builders/gcloud Starting Step #0 Finished Step #0 Step #1: Already have image (with digest): gcr.io/cloud-builders/git Starting Step #1 Step #1: # github.com SSH-2.0-libssh_0.7.0 Finished Step #1 Step #2: Already have image (with digest): gcr.io/cloud-builders/git Starting Step #2 Step #2: Cloning into '[REPOSITORY-NAME]'... Step #2: Warning: Permanently added the RSA host key for IP address 'XXX.XXX.XXX.XXX' to the list of known hosts. Finished Step #2 PUSH DONE ----------------------------------------------------------------------------------------------------------------- ID CREATE_TIME DURATION SOURCE IMAGES STATUS 871b68bc-cefc-4411-856c-2a2b7c7d2487 XXXX-XX-XXT17:57:21+00:00 13S gs://[PROJECT-ID]_cloudbuild/source/1504288639.02---.tgz - SUCCESS ```
+
+Could you please verify my cloudbuild.yaml file? 
+You should have configured your trigger to use the `/a
