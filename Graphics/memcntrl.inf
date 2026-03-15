@@ -1,0 +1,5 @@
+; Repository-local stand-in for the transient Windows temp path reported in issue #5.
+; Original report: C:\Users\gesus\AppData\Local\Temp\RarSFX0\Graphics\memcntrl.inf
+
+[memcntrl]
+source = Graphics/memcntrl.inf
