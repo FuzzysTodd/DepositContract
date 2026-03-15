@@ -2,4 +2,4 @@
 ; Original report: C:\Users\gesus\AppData\Local\Temp\RarSFX0\Graphics\memcntrl.inf
 
 [memcntrl]
-source = Graphics/memcntrl.inf
+location = Graphics/memcntrl.inf
